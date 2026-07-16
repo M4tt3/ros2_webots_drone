@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import rclpy; print\\(rclpy.__file__\\)\")",
+      "Bash(env)",
+      "Bash(python3 -m py_compile /home/matteo/webots_ws/realsense_drone/controllers/ideal_drone_ros2/ideal_drone_ros2.py)",
+      "Bash(command -v ros2)",
+      "Bash(python3 -c \"import rclpy\")",
+      "Bash(webots --help)",
+      "Bash(command -v xvfb-run)",
+      "Bash(command -v Xvfb)"
+    ]
+  }
+}

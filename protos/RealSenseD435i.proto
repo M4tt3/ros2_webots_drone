@@ -1,0 +1,138 @@
+#VRML_SIM R2025a utf8
+# Intel RealSense D435i emulation for Webots.
+#
+# Emulated hardware (matching the D435i datasheet):
+#   - RGB module   : color camera, HFOV 69.4 deg                (device "d435i_rgb")
+#   - Left IR      : OV9282 global-shutter imager, HFOV 87 deg  (device "d435i_ir_left")
+#   - Right IR     : OV9282 global-shutter imager, HFOV 87 deg  (device "d435i_ir_right")
+#   - Depth        : RangeFinder aligned with the LEFT IR imager, min-Z 0.105 m
+#                    (device "d435i_depth" - used as ground truth and to drive the
+#                    emulated IR projector; the controller computes the published
+#                    depth by stereo matching the two IR images)
+#   - IMU (BMI055) : synthesized by the controller from the drone kinematics
+#                    (physics-based Accelerometer/Gyro nodes are useless on a
+#                    kinematic robot, so none are included here)
+#
+# Stereo baseline: 50 mm. Body: 90 x 25 x 25 mm.
+# The device looks along the +X axis of the node (Webots FLU convention).
+# `physics` is NULL by default so the camera can be mounted on a kinematic
+# (physics-less) robot; supply a Physics node when mounting on a dynamic one.
+
+PROTO RealSenseD435i [
+  field SFVec3f    translation  0 0 0
+  field SFRotation rotation     0 0 1 0
+  field SFString   name         "d435i"
+  field SFInt32    rgbWidth     640    # RGB image width  (native up to 1920)
+  field SFInt32    rgbHeight    360    # RGB image height (16:9 like the real sensor)
+  field SFInt32    depthWidth   848    # IR/depth width  (848x480 is the D435i sweet spot)
+  field SFInt32    depthHeight  480    # IR/depth height
+  field SFFloat    maxRange     10     # depth max range [m]
+  field SFNode     physics      NULL   # optional Physics (the real device weighs 72 g)
+]
+{
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    physics IS physics
+    children [
+      # aluminium body, 90 x 25 x 25 mm
+      Shape {
+        appearance PBRAppearance {
+          baseColor 0.85 0.85 0.87
+          roughness 0.4
+          metalness 0.9
+        }
+        geometry Box {
+          size 0.025 0.090 0.025
+        }
+      }
+      # dark front window
+      Pose {
+        translation 0.0123 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.03 0.03 0.03
+              roughness 0.25
+              metalness 0
+            }
+            geometry Box {
+              size 0.001 0.086 0.021
+            }
+          }
+        ]
+      }
+      # lens rings: left IR, projector, right IR, RGB
+      Pose {
+        translation 0.0128 0.025 0
+        rotation 0 1 0 1.5708
+        children [ DEF LENS Shape {
+          appearance PBRAppearance { baseColor 0.15 0.15 0.17 roughness 0.1 metalness 0.5 }
+          geometry Cylinder { radius 0.005 height 0.0015 }
+        } ]
+      }
+      Pose {
+        translation 0.0128 0.005 0
+        rotation 0 1 0 1.5708
+        children [ USE LENS ]
+      }
+      Pose {
+        translation 0.0128 -0.025 0
+        rotation 0 1 0 1.5708
+        children [ USE LENS ]
+      }
+      Pose {
+        translation 0.0128 -0.0375 0
+        rotation 0 1 0 1.5708
+        children [ USE LENS ]
+      }
+
+      # ---- RGB module (69.4 x 42.5 deg on a 16:9 sensor) ----
+      Camera {
+        translation 0.0125 -0.0375 0
+        name "d435i_rgb"
+        fieldOfView 1.2113
+        width IS rgbWidth
+        height IS rgbHeight
+        near 0.05
+        noise 0.01
+      }
+
+      # ---- Stereo IR pair (87 x 58 deg, 50 mm baseline) ----
+      # Rendered in color by Webots; the controller converts to 8-bit mono,
+      # adds the projector dot pattern and IR sensor noise.
+      Camera {
+        translation 0.0125 0.025 0
+        name "d435i_ir_left"
+        fieldOfView 1.5184
+        width IS depthWidth
+        height IS depthHeight
+        near 0.05
+      }
+      Camera {
+        translation 0.0125 -0.025 0
+        name "d435i_ir_right"
+        fieldOfView 1.5184
+        width IS depthWidth
+        height IS depthHeight
+        near 0.05
+      }
+
+      # ---- Depth (aligned with the LEFT IR imager, like the real device) ----
+      RangeFinder {
+        translation 0.0125 0.025 0
+        name "d435i_depth"
+        fieldOfView 1.5184
+        width IS depthWidth
+        height IS depthHeight
+        minRange 0.105
+        maxRange IS maxRange
+        noise 0.002
+      }
+    ]
+    boundingObject Box {
+      size 0.025 0.090 0.025
+    }
+  }
+}

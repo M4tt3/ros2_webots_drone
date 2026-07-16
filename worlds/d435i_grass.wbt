@@ -1,0 +1,86 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
+EXTERNPROTO "../protos/IdealDrone.proto"
+EXTERNPROTO "../protos/RealSenseD435i.proto"
+
+WorldInfo {
+  info [
+    "Ideal (kinematic) drone on grass carrying a fully emulated Intel RealSense D435i."
+    "All sensor data is published to ROS 2 topics; the drone executes x/y/z/yaw"
+    "setpoints from /drone/cmd_pose with velocity-limited, noise-injected motion."
+    "Launch Webots from a shell with ROS 2 sourced."
+  ]
+  title "RealSense D435i drone on grass (ROS 2)"
+  basicTimeStep 8
+  defaultDamping Damping {
+    linear 0.5
+    angular 0.5
+  }
+}
+Viewpoint {
+  orientation -0.12218933960689862 0.15592878945301727 0.9801816045540471 1.6967859158091612
+  position 1.455727157253503 -12.852255557875386 5.8878661761420155
+  follow "drone"
+  followSmoothness 0.2
+}
+TexturedBackground {
+  luminosity 0.8
+}
+TexturedBackgroundLight {
+}
+Floor {
+  size 100 100
+  appearance Grass {
+    textureTransform TextureTransform {
+      scale 0.2 0.2
+    }
+  }
+}
+IdealDrone {
+  translation 0.0037267272668036443 0.0017184245150786367 2.0001812164009567
+  rotation 0 0 1 0.0005605621323843124
+  sensorSlot [
+    RealSenseD435i {
+      translation 0.034 0 -0.035
+      rotation 0.6776582128675256 0.519990070353844 -0.519990070353844 1.9504488000931088
+    }
+  ]
+}
+DEF takeoff Solid {
+  children [
+    Pose {
+      translation 0 0 0.026
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0.8 0.8
+            }
+            texture ImageTexture {
+              url [
+                "../arucos/5x5_1000-101.png"
+              ]
+            }
+          }
+          geometry Plane {
+            size 0.15 0.15
+          }
+        }
+      ]
+    }
+    Shape {
+      geometry Cylinder {
+        height 0.05
+        radius 0.6
+      }
+    }
+  ]
+  boundingObject Cylinder {
+    height 0.05
+    radius 0.6
+  }
+}

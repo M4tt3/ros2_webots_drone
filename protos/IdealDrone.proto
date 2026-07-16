@@ -1,0 +1,134 @@
+#VRML_SIM R2025a utf8
+# Ideal (kinematic) quadcopter for sensor-simulation work.
+#
+# No Physics node and no Propeller devices: the controller is a Supervisor and
+# moves the robot by writing its translation/rotation fields directly, so pose
+# commands are executed "ideally" (velocity-limited, optionally noise-injected).
+# The visual body reuses the official DJI Mavic 2 Pro meshes (fetched from the
+# Webots GitHub assets on first load, then cached).
+#
+# Mount sensors (e.g. RealSenseD435i) in `sensorSlot`.
+
+PROTO IdealDrone [
+  field SFVec3f    translation    0 0 0.1
+  field SFRotation rotation       0 0 1 0
+  field SFString   name           "drone"
+  field SFString   controller     "ideal_drone_ros2"
+  field MFString   controllerArgs []
+  field SFBool     supervisor     TRUE
+  field MFNode     sensorSlot     []
+]
+{
+  Robot {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    controller IS controller
+    controllerArgs IS controllerArgs
+    supervisor IS supervisor
+    children [
+      Group {
+        children IS sensorSlot
+      }
+      Shape {
+        appearance DEF GREY_PLASTIC PBRAppearance {
+          baseColor 0.5 0.5 0.5
+          metalness 0
+          roughness 0.8
+        }
+        geometry Mesh {
+          url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/body.obj"
+        }
+      }
+      Shape {
+        appearance DEF METAL_APPEARANCE PBRAppearance {
+          roughness 0.5
+        }
+        geometry Mesh {
+          url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/body_metal_parts.obj"
+        }
+      }
+      Shape {
+        appearance PBRAppearance {
+          baseColor 0.523146 0.8 0.627785
+          transparency 0.9
+          roughness 0.5
+          metalness 0
+        }
+        geometry Mesh {
+          url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/body_lenses.obj"
+        }
+      }
+      # static propellers (helix_a on the front-right/rear-left diagonal,
+      # helix_b on the other, at the Mavic thrust positions)
+      DEF PROP_FL Pose {
+        translation 0.177179 0.127453 -0.0320282
+        children [
+          Shape {
+            appearance USE GREY_PLASTIC
+            geometry Mesh {
+              url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b.obj"
+            }
+          }
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_joint.obj"
+            }
+          }
+        ]
+      }
+      DEF PROP_FR Pose {
+        translation 0.177179 -0.127453 -0.0320282
+        children [
+          Shape {
+            appearance USE GREY_PLASTIC
+            geometry Mesh {
+              url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a.obj"
+            }
+          }
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_joint.obj"
+            }
+          }
+        ]
+      }
+      DEF PROP_RL Pose {
+        translation -0.177179 0.127453 -0.0320282
+        children [
+          Shape {
+            appearance USE GREY_PLASTIC
+            geometry Mesh {
+              url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a.obj"
+            }
+          }
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_joint.obj"
+            }
+          }
+        ]
+      }
+      DEF PROP_RR Pose {
+        translation -0.177179 -0.127453 -0.0320282
+        children [
+          Shape {
+            appearance USE GREY_PLASTIC
+            geometry Mesh {
+              url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b.obj"
+            }
+          }
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_joint.obj"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
