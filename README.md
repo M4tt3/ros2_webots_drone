@@ -2,7 +2,7 @@
 
 A Webots (R2025a) simulation of an ideal (kinematic) drone on grass carrying a
 **fully emulated Intel RealSense D435i**: RGB module, both IR imagers with the
-projected dot pattern, stereo-matched depth, and a synthesized IMU. Everything
+projected dot pattern, stereo-matched depth, and an onboard IMU. Everything
 is published to ROS 2 topics; the drone executes x/y/z/yaw pose setpoints
 "ideally" with velocity-limited, parameter-tunable noisy motion.
 
@@ -42,7 +42,7 @@ View the streams with `rviz2` or `ros2 run rqt_image_view rqt_image_view`.
 | `/d435i/infra2/image_raw` + `camera_info` | `sensor_msgs/Image` | mono8, right IR (P matrix carries the -fx·B baseline) |
 | `/d435i/depth/image_rect_raw` + `camera_info` | `sensor_msgs/Image` | 32FC1 metres, **SGBM on the IR pair** (0 = invalid) |
 | `/d435i/depth_gt/image_raw` | `sensor_msgs/Image` | 32FC1 metres, RangeFinder ground truth |
-| `/d435i/imu` | `sensor_msgs/Imu` | synthesized BMI055 accel + gyro, ~125 Hz |
+| `/drone/imu` | `sensor_msgs/Imu` | synthesized BMI055 accel + gyro, ~125 Hz |
 | `/tf`, `/clock` | | odom→base_link→d435i_link→optical frames; sim time |
 
 ## How the D435i is emulated
@@ -63,7 +63,10 @@ View the streams with `rviz2` or `ros2 run rqt_image_view rqt_image_view`.
    shows realistic failure modes (no return on sky, washed-out dots at range,
    occlusion shadows, noise speckle).
 5. The IMU is synthesized from the drone kinematics: body-frame specific force
-   (including gravity) + yaw-rate gyro, with configurable noise.
+   (including gravity) + yaw-rate gyro, with configurable noise. Webots'
+   `Accelerometer`/`Gyro` devices need a physics-driven body to report anything
+   meaningful, which this ideal (teleported, no-dynamics) drone deliberately is
+   not, so hardware IMU emulation isn't used here.
 
 ## Ideal drone
 

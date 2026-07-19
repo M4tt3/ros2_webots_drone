@@ -30,7 +30,7 @@ Published topics
     /d435i/depth/image_rect_raw  sensor_msgs/Image      32FC1 [m], SGBM on the IR pair
     /d435i/depth/camera_info     sensor_msgs/CameraInfo
     /d435i/depth_gt/image_raw    sensor_msgs/Image      32FC1 [m], RangeFinder ground truth
-    /d435i/imu                   sensor_msgs/Imu        synthesized BMI055 (accel + gyro)
+    /drone/imu                   sensor_msgs/Imu        synthesized BMI055 (accel + gyro)
     /tf, /clock
 
 Parameters (override via controllerArgs in the world file, e.g.
@@ -124,7 +124,7 @@ class IdealDroneNode(Node):
         self.pub_odom = self.create_publisher(Odometry, "/drone/odom", 10)
         self.pub_tf = self.create_publisher(TFMessage, "/tf", 10)
         self.pub_clock = self.create_publisher(Clock, "/clock", 10)
-        self.pub_imu = self.create_publisher(Imu, "/d435i/imu", qos_profile_sensor_data)
+        self.pub_imu = self.create_publisher(Imu, "/drone/imu", qos_profile_sensor_data)
         img_qos = qos_profile_sensor_data
         # ov_msckf's stereo message_filters::Subscriber uses the default (RELIABLE) QoS,
         # so infra1/infra2 must be published RELIABLE or the VIO subscriber never matches.
@@ -391,13 +391,15 @@ def main():
 
         # synthesized BMI055: specific force in the body frame + yaw gyro.
         # Differentiate the noise-free commanded velocity - differentiating the
-        # noise-injected one would blow white velocity noise up by 1/dt.
+        # noise-injected one would blow white velocity noise up by 1/dt. Webots'
+        # own Gyro/Accelerometer devices need a Physics-driven (non-kinematic)
+        # body to report anything meaningful, which this ideal/teleported drone
+        # is not (see RealSenseD435i.proto), so the IMU is synthesized instead.
         accel_world = (vel_des - prev_vel) / dt + np.array([0.0, 0.0, GRAVITY])
         prev_vel = vel_des.copy()
         imu = Imu()
         imu.header.stamp = stamp
         imu.header.frame_id = "d435i_imu_frame"
-        imu.orientation_covariance[0] = -1.0  # no orientation, like the real device
         imu.linear_acceleration.x = (cos_y * accel_world[0] + sin_y * accel_world[1]
                                      + rng.normal(0.0, param("imu_accel_noise")))
         imu.linear_acceleration.y = (-sin_y * accel_world[0] + cos_y * accel_world[1]

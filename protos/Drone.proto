@@ -1,0 +1,913 @@
+#VRML_SIM R2025a utf8
+# Quadcopter for sensor-simulation work.
+# Mount sensors (e.g. RealSenseD435i) in `sensorSlot`.
+
+PROTO Drone [
+  field SFVec3f    translation     0 0 0.1
+  field SFRotation rotation        0 0 1 0
+  field SFString   name            "drone"
+  field SFString   controller      "<generic>"
+  field MFString   controllerArgs  []
+  field SFBool     supervisor      TRUE
+  field SFBool     synchronization TRUE
+  field MFNode     sensorSlot      []
+]
+{
+Robot {
+  translation IS translation
+  rotation IS rotation
+  name IS name
+  controller IS controller
+  controllerArgs IS controllerArgs
+  supervisor IS supervisor
+  synchronization IS synchronization
+  children [
+    Group {
+      children IS sensorSlot
+    }
+    Shape {
+      appearance DEF GREY_PLASTIC PBRAppearance {
+        baseColor 0.5 0.5 0.5
+        roughness 0.8
+        metalness 0
+      }
+      geometry Mesh {
+        url [
+          "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/body.obj"
+        ]
+      }
+    }
+    Shape {
+      appearance DEF METAL_APPEARANCE PBRAppearance {
+        roughness 0.5
+      }
+      geometry Mesh {
+        url [
+          "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/body_metal_parts.obj"
+        ]
+      }
+    }
+    Shape {
+      appearance DEF GLASS PBRAppearance {
+        baseColor 0.523146 0.8 0.627785
+        transparency 0.9
+        roughness 0.5
+        metalness 0
+      }
+      geometry Mesh {
+        url [
+          "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/body_lenses.obj"
+        ]
+      }
+    }
+    DEF REAR_LEFT_HP_HELIX Propeller {
+      shaftAxis 0 0 1
+      centerOfThrust -0.177179 0.127453 -0.0320282
+      thrustConstants -0.00026 0
+      torqueConstants 5.2e-06 0
+      fastHelixThreshold 50
+      device RotationalMotor {
+        name "rear left propeller"
+        maxVelocity 576
+        maxTorque 30
+      }
+      fastHelix Solid {
+        translation -0.177179 0.127453 -0.0320282
+        children [
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_joint.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_normal.jpg"
+                ]
+                filtering 5
+              }
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_plates.obj"
+              ]
+            }
+          }
+          Pose {
+            translation 0 0 0.02
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.5 0.5 0.5
+                  baseColorMap ImageTexture {
+                    url [
+                      "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/default/protos/textures/fast_helix.png"
+                    ]
+                  }
+                  metalness 0
+                }
+                geometry Cylinder {
+                  height 0.001
+                  radius 0.12
+                  side FALSE
+                }
+              }
+            ]
+          }
+        ]
+        boundingObject Group {
+          children [
+            Pose {
+              translation 0 0 0.015
+              children [
+                Cylinder {
+                  height 0.025
+                  radius 0.12
+                }
+              ]
+            }
+          ]
+        }
+        physics Physics {
+          density -1
+          mass 0.1
+        }
+      }
+      slowHelix Solid {
+        translation -0.177179 0.127453 -0.0320282
+        children [
+          Shape {
+            appearance USE GREY_PLASTIC
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_joint.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_normal.jpg"
+                ]
+                filtering 5
+              }
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_plates.obj"
+              ]
+            }
+          }
+        ]
+        name "rear left propeller"
+        boundingObject Group {
+          children [
+            Pose {
+              translation 0 0 0.015
+              children [
+                Cylinder {
+                  height 0.025
+                  radius 0.013
+                }
+              ]
+            }
+            Pose {
+              translation 0 0 0.023
+              rotation 0 0 1 0.7854
+              children [
+                Box {
+                  size 0.23 0.018 0.005
+                }
+              ]
+            }
+          ]
+        }
+        physics Physics {
+          density -1
+          mass 0.1
+        }
+      }
+    }
+    DEF REAR_RIGHT_HP_HELIX Propeller {
+      shaftAxis 0 0 1
+      centerOfThrust -0.177179 -0.127453 -0.0320282
+      thrustConstants 0.00026 0
+      torqueConstants 5.2e-06 0
+      fastHelixThreshold 50
+      device RotationalMotor {
+        name "rear right propeller"
+        maxVelocity 576
+        maxTorque 30
+      }
+      fastHelix Solid {
+        translation -0.177179 -0.127453 -0.0320282
+        children [
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_joint.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_normal.jpg"
+                ]
+                filtering 5
+              }
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_plates.obj"
+              ]
+            }
+          }
+          Pose {
+            translation 0 0 0.02
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.5 0.5 0.5
+                  baseColorMap ImageTexture {
+                    url [
+                      "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/default/protos/textures/fast_helix.png"
+                    ]
+                  }
+                  metalness 0
+                }
+                geometry Cylinder {
+                  height 0.001
+                  radius 0.12
+                  side FALSE
+                }
+              }
+            ]
+          }
+        ]
+        boundingObject Group {
+          children [
+            Pose {
+              translation 0 0 0.015
+              children [
+                Cylinder {
+                  height 0.025
+                  radius 0.12
+                }
+              ]
+            }
+          ]
+        }
+        physics Physics {
+          density -1
+          mass 0.1
+        }
+      }
+      slowHelix Solid {
+        translation -0.177179 -0.127453 -0.0320282
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.5 0.5 0.5
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_joint.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_normal.jpg"
+                ]
+                filtering 5
+              }
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_plates.obj"
+              ]
+            }
+          }
+        ]
+        name "rear right propeller"
+        boundingObject Group {
+          children [
+            Pose {
+              translation 0 0 0.015
+              children [
+                Cylinder {
+                  height 0.025
+                  radius 0.013
+                }
+              ]
+            }
+            Pose {
+              translation 0 0 0.023
+              rotation 0 0 1 -0.7854
+              children [
+                Box {
+                  size 0.23 0.018 0.005
+                }
+              ]
+            }
+          ]
+        }
+        physics Physics {
+          density -1
+          mass 0.1
+        }
+      }
+    }
+    DEF FRONT_RIGHT_HP_HELIX Propeller {
+      shaftAxis 0 0 1
+      centerOfThrust 0.0548537 -0.151294 -0.00280468
+      thrustConstants -0.00026 0
+      torqueConstants 5.2e-06 0
+      fastHelixThreshold 50
+      device RotationalMotor {
+        name "front right propeller"
+        maxVelocity 576
+        maxTorque 30
+      }
+      fastHelix Solid {
+        translation 0.0548537 -0.151294 -0.00280468
+        children [
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_joint.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_normal.jpg"
+                ]
+                filtering 5
+              }
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_plates.obj"
+              ]
+            }
+          }
+          Pose {
+            translation 0 0 0.02
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.5 0.5 0.5
+                  baseColorMap ImageTexture {
+                    url [
+                      "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/default/protos/textures/fast_helix.png"
+                    ]
+                  }
+                  metalness 0
+                }
+                geometry Cylinder {
+                  height 0.001
+                  radius 0.12
+                  side FALSE
+                }
+              }
+            ]
+          }
+        ]
+        boundingObject Group {
+          children [
+            Pose {
+              translation 0 0 0.015
+              children [
+                Cylinder {
+                  height 0.025
+                  radius 0.12
+                }
+              ]
+            }
+          ]
+        }
+        physics Physics {
+          density -1
+          mass 0.1
+        }
+      }
+      slowHelix Solid {
+        translation 0.0548537 -0.151294 -0.00280468
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.5 0.5 0.5
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_joint.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_normal.jpg"
+                ]
+                filtering 5
+              }
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_a_plates.obj"
+              ]
+            }
+          }
+        ]
+        name "front right propeller"
+        boundingObject Group {
+          children [
+            Pose {
+              translation 0 0 0.015
+              children [
+                Cylinder {
+                  height 0.025
+                  radius 0.013
+                }
+              ]
+            }
+            Pose {
+              translation 0 0 0.023
+              rotation 0 0 1 0.7854
+              children [
+                Box {
+                  size 0.23 0.018 0.005
+                }
+              ]
+            }
+          ]
+        }
+        physics Physics {
+          density -1
+          mass 0.1
+        }
+      }
+    }
+    DEF FRONT_LEFT_HP_HELIX Propeller {
+      shaftAxis 0 0 1
+      centerOfThrust 0.0548537 0.151294 -0.00280468
+      thrustConstants 0.00026 0
+      torqueConstants 5.2e-06 0
+      fastHelixThreshold 50
+      device RotationalMotor {
+        name "front left propeller"
+        maxVelocity 576
+        maxTorque 30
+      }
+      fastHelix Solid {
+        translation 0.0548537 0.151294 -0.00280468
+        children [
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_joint.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_normal.jpg"
+                ]
+                filtering 5
+              }
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_plates.obj"
+              ]
+            }
+          }
+          Pose {
+            translation 0 0 0.02
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.5 0.5 0.5
+                  baseColorMap ImageTexture {
+                    url [
+                      "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/default/protos/textures/fast_helix.png"
+                    ]
+                  }
+                  metalness 0
+                }
+                geometry Cylinder {
+                  height 0.001
+                  radius 0.12
+                  side FALSE
+                }
+              }
+            ]
+          }
+        ]
+        boundingObject Group {
+          children [
+            Pose {
+              translation 0 0 0.015
+              children [
+                Cylinder {
+                  height 0.025
+                  radius 0.12
+                }
+              ]
+            }
+          ]
+        }
+        physics Physics {
+          density -1
+          mass 0.1
+        }
+      }
+      slowHelix Solid {
+        translation 0.0548537 0.151294 -0.00280468
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.5 0.5 0.5
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance USE METAL_APPEARANCE
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_joint.obj"
+              ]
+            }
+          }
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+              baseColorMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/matte_car_paint/matte_car_paint_base_color.jpg"
+                ]
+                filtering 5
+              }
+              roughnessMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_roughness.jpg"
+                ]
+                filtering 5
+              }
+              metalness 0
+              normalMap ImageTexture {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/glossy_car_paint/glossy_car_paint_normal.jpg"
+                ]
+                filtering 5
+              }
+              normalMapFactor 0.5
+              textureTransform TextureTransform {
+                scale 10 10
+              }
+            }
+            geometry Mesh {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro/meshes/helix_b_plates.obj"
+              ]
+            }
+          }
+        ]
+        name "front left propeller"
+        boundingObject Group {
+          children [
+            Pose {
+              translation 0 0 0.015
+              children [
+                Cylinder {
+                  height 0.025
+                  radius 0.013
+                }
+              ]
+            }
+            Pose {
+              translation 0 0 0.023
+              rotation 0 0 1 -0.7854
+              children [
+                Box {
+                  size 0.23 0.018 0.005
+                }
+              ]
+            }
+          ]
+        }
+        physics Physics {
+          density -1
+          mass 0.1
+        }
+      }
+    }
+  ]
+  name "Mavic 2 PRO"
+  model "DJI Mavic 2 PRO"
+  boundingObject Group {
+    children [
+      Pose {
+        translation -0.03 0 0.002
+        children [
+          Box {
+            size 0.21 0.085 0.027
+          }
+        ]
+      }
+      Pose {
+        translation -0.06 0 -0.03
+        children [
+          Box {
+            size 0.15 0.06 0.053
+          }
+        ]
+      }
+      Pose {
+        translation 0.03 0.09 -0.001
+        rotation 0 0 1 -0.3926996938995747
+        children [
+          Box {
+            size 0.01 0.15 0.025
+          }
+        ]
+      }
+      Pose {
+        translation 0.03 -0.09 -0.001
+        rotation 0 0 1 0.3927
+        children [
+          Box {
+            size 0.01 0.15 0.025
+          }
+        ]
+      }
+      Pose {
+        translation -0.138 0.08 -0.032
+        rotation 0 0 1 0.68
+        children [
+          Box {
+            size 0.01 0.12 0.018
+          }
+        ]
+      }
+      Pose {
+        translation -0.138 -0.08 -0.032
+        rotation 0 0 1 -0.68
+        children [
+          Box {
+            size 0.01 0.12 0.018
+          }
+        ]
+      }
+      Pose {
+        translation 0.06 0.15 -0.039
+        rotation 1 0 0 -0.29
+        children [
+          Box {
+            size 0.01 0.014 0.06
+          }
+        ]
+      }
+      Pose {
+        translation 0.06 -0.15 -0.039
+        rotation 1 0 0 0.29
+        children [
+          Box {
+            size 0.01 0.014 0.06
+          }
+        ]
+      }
+    ]
+  }
+  physics Physics {
+    density -1
+    mass 0.4
+    centerOfMass [
+      -0.061 0 -0.04
+    ]
+  }
+}
+}

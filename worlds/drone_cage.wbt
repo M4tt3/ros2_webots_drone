@@ -1,0 +1,321 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "../protos/Drone.proto"
+EXTERNPROTO "../protos/RealSenseD435i.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/GalvanizedMetal.proto"
+
+WorldInfo {
+  info [
+    "Ideal (kinematic) drone on grass carrying a fully emulated Intel RealSense D435i."
+    "All sensor data is published to ROS 2 topics; the drone executes x/y/z/yaw"
+    "setpoints from /drone/cmd_pose with velocity-limited, noise-injected motion."
+    "Launch Webots from a shell with ROS 2 sourced."
+  ]
+  title "RealSense D435i drone on grass (ROS 2)"
+  basicTimeStep 8
+  defaultDamping Damping {
+    linear 0.5
+    angular 0.5
+  }
+}
+Viewpoint {
+  orientation -0.1558321630777149 0.02901684604574731 0.9873572603653036 3.1115762810331917
+  position 29.99653354166836 -0.6121573586787439 11.218795700252016
+  followSmoothness 0.2
+}
+TexturedBackground {
+  luminosity 0.8
+}
+TexturedBackgroundLight {
+}
+DEF takeoff Solid {
+  children [
+    Pose {
+      translation 0 0 0.026
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0.8 0.8
+            }
+            texture ImageTexture {
+              url [
+                "../arucos/5x5_1000-101.png"
+              ]
+            }
+          }
+          geometry Plane {
+            size 0.15 0.15
+          }
+        }
+      ]
+    }
+    Shape {
+      geometry Cylinder {
+        height 0.05
+        radius 0.6
+      }
+    }
+  ]
+  boundingObject Cylinder {
+    height 0.05
+    radius 0.6
+  }
+}
+Floor {
+  size 100 100
+  appearance Grass {
+    textureTransform TextureTransform {
+      scale 0.4 0.4
+    }
+  }
+}
+Drone {
+  hidden linearVelocity_0 -2.3357797355051005e-14 4.787554327710434e-14 3.865723705132192e-13
+  hidden angularVelocity_0 -2.2159230032118836e-12 -1.0811365328015152e-12 -1.0391319063027217e-16
+  translation -0.04142559486285012 -0.03654409288961244 0.09071830632327596
+  rotation -0.017196662880681064 -0.8697844763045991 -0.4931320711181766 0.08014320976633349
+  controller "mavic2pro_ros2"
+  sensorSlot [
+    DEF GPS GPS {
+    }
+    DEF InertialUnit InertialUnit {
+    }
+    DEF Accelerometer Accelerometer {
+    }
+    DEF Gyro Gyro {
+    }
+    RealSenseD435i {
+      translation 0.065461 -1.24194e-07 -0.00532901
+      rotation 0.6776582128675256 0.519990070353844 -0.519990070353844 1.9504488000931088
+    }
+  ]
+}
+DEF CAGE Group {
+  children [
+    Solid {
+      translation -5 0 2
+      rotation 0 1 0 1.57
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_Color.png"
+              ]
+            }
+            roughnessMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_Roughness.png"
+              ]
+            }
+            normalMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_NormalGL.png"
+              ]
+            }
+            occlusionMap ImageTexture {
+            }
+            textureTransform TextureTransform {
+              scale 10 20
+            }
+          }
+          geometry Plane {
+            size 4 10
+          }
+        }
+      ]
+      name "wall_1"
+      boundingObject Plane {
+        size 4 10
+      }
+    }
+    Solid {
+      translation 5.01 1.88335e-05 2.00856
+      rotation 0.7073882252434113 3.3891510791584073e-09 -0.7068252250641434 3.14159
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_Color.png"
+              ]
+            }
+            roughnessMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_Roughness.png"
+              ]
+            }
+            normalMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_NormalGL.png"
+              ]
+            }
+            occlusionMap ImageTexture {
+            }
+            textureTransform TextureTransform {
+              scale 10 20
+            }
+          }
+          geometry Plane {
+            size 4 10
+          }
+        }
+      ]
+      name "wall_2"
+      boundingObject Plane {
+        size 4 10
+      }
+    }
+    Solid {
+      translation 0.04 -5.00998 2.0044
+      rotation 0.577656895078166 -0.5771968951617173 -0.5771968951617173 -2.093935307179586
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_Color.png"
+              ]
+            }
+            roughnessMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_Roughness.png"
+              ]
+            }
+            normalMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_NormalGL.png"
+              ]
+            }
+            occlusionMap ImageTexture {
+            }
+            textureTransform TextureTransform {
+              scale 10 20
+            }
+          }
+          geometry Plane {
+            size 4 10
+          }
+        }
+      ]
+      name "wall_4"
+      boundingObject Plane {
+        size 4 10
+      }
+    }
+    Solid {
+      translation 0 5 2
+      rotation 0.577656895078166 0.5771968951617173 -0.5771968951617173 2.09393
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_Color.png"
+              ]
+            }
+            roughnessMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_Roughness.png"
+              ]
+            }
+            normalMap ImageTexture {
+              url [
+                "../textures/net_texture/Net004A_1K-PNG_NormalGL.png"
+              ]
+            }
+            occlusionMap ImageTexture {
+            }
+            textureTransform TextureTransform {
+              scale 10 20
+            }
+          }
+          geometry Plane {
+            size 4 10
+          }
+        }
+      ]
+      name "wall_3"
+      boundingObject Plane {
+        size 4 10
+      }
+    }
+    Solid {
+      translation -5 -5 2
+      children [
+        Shape {
+          appearance GalvanizedMetal {
+          }
+          geometry Cylinder {
+            height 4
+            radius 0.05
+          }
+        }
+      ]
+      name "pole_1"
+      boundingObject Cylinder {
+        height 4
+        radius 0.05
+      }
+    }
+    Solid {
+      translation 5 -5 2
+      children [
+        Shape {
+          appearance GalvanizedMetal {
+          }
+          geometry Cylinder {
+            height 4
+            radius 0.05
+          }
+        }
+      ]
+      name "pole_2"
+      boundingObject Cylinder {
+        height 4
+        radius 0.05
+      }
+    }
+    Solid {
+      translation -5 5 2
+      children [
+        Shape {
+          appearance GalvanizedMetal {
+          }
+          geometry Cylinder {
+            height 4
+            radius 0.05
+          }
+        }
+      ]
+      name "pole_3"
+      boundingObject Cylinder {
+        height 4
+        radius 0.05
+      }
+    }
+    Solid {
+      translation 5 5 2
+      children [
+        Shape {
+          appearance GalvanizedMetal {
+          }
+          geometry Cylinder {
+            height 4
+            radius 0.05
+          }
+        }
+      ]
+      name "pole_4"
+      boundingObject Cylinder {
+        height 4
+        radius 0.05
+      }
+    }
+  ]
+}
