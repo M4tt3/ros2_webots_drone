@@ -43,11 +43,11 @@ from sensor_msgs.msg import CameraInfo, Image, Imu
 from tf2_msgs.msg import TFMessage
 from transforms3d import quaternions, euler
 
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Float32
 
 import threading
 
-PRINT_STATUS = True
+PRINT_STATUS = False
 
 # Camera parameters
 IMAGE_RATE = 15.0
@@ -77,7 +77,7 @@ VERTICAL_P = 3.0
 THRUST_BASELINE = 60
 K_VERTICAL_OFFSET = 0.6  # add to altitude error to avoid oscillating around zero
 ATTITUDE_CLAMP_RAD = 1.0  # saturate the measured roll/pitch fed into the P terms
-TAKEOFF_K = 3.0
+TAKEOFF_K = 4.0
 
 ROLL_BIAS = 0.0
 PITCH_BIAS = 0.0
@@ -109,12 +109,11 @@ def yaw_from_quaternion(q):
                       1.0 - 2.0 * (q.y * q.y + q.z * q.z))
 
 class DroneControllerNode(Node):
-    def __init__(self, supervisor: Supervisor):
-        super().__init__("webots_mavic2pro_controller")
-
+    def __init__(self, supervisor: Supervisor, node: Node):
+        self.node = node
+        self.supervisor = supervisor
         dt = supervisor.getBasicTimeStep()
 
-        self.supervisor = supervisor
         self.motors = {
             "front_left": self.supervisor.getDevice("front left propeller"),
             "front_right": self.supervisor.getDevice("front right propeller"),
@@ -139,15 +138,16 @@ class DroneControllerNode(Node):
 
         self.cmd_vel = np.zeros(4)  # x, y, z, yaw_rate in body frame
         self.last_cmd_vel_time = -math.inf
-        self.target_altitude = 1.5
+        self.target_altitude = 2.0
         self.sim_time = 0.0  # kept in sync by the main loop, used to time out stale cmd_vel
 
-        self.create_subscription(Twist, "/drone/cmd_vel", self.on_cmd_vel, 10)
-        self.create_subscription(Bool, "/drone/arm", self.on_arm, 10)
+        node.create_subscription(Twist, "/drone/cmd_vel", self.on_cmd_vel, 10)
+        node.create_subscription(Bool, "/drone/arm", self.on_arm, 10)
+        node.create_subscription(Float32, "/drone/target_altitude", self.on_target_altitude, 10)
 
-        self.pub_odom = self.create_publisher(Odometry, "/drone/odom", 10)
-        self.pub_clock = self.create_publisher(Clock, "/clock", 10)
-        self.pub_imu = self.create_publisher(Imu, "/drone/imu", qos_profile_sensor_data)
+        self.pub_odom = node.create_publisher(Odometry, "/drone/odom", 10)
+        self.pub_clock = node.create_publisher(Clock, "/clock", 10)
+        self.pub_imu = node.create_publisher(Imu, "/drone/imu", qos_profile_sensor_data)
         
         #self.timer = self.create_timer(dt / 1000.0, self.control_loop)  # 100 Hz control loop
 
@@ -276,6 +276,9 @@ class DroneControllerNode(Node):
                 motor.setVelocity(0.0)
             self.takeoff = False
 
+    def on_target_altitude(self, msg: Float32):
+        self.target_altitude = msg.data
+
     def control_loop(self):
 
         if not self.armed:
@@ -301,7 +304,7 @@ class DroneControllerNode(Node):
         vertical_input = clamped_difference_altitude ** 3 * VERTICAL_P  # simple P controller for altitude
 
         if not self.takeoff:
-            self.takeoff = altitude > self.target_altitude * 0.5
+            self.takeoff = altitude > self.target_altitude * 0.4
             vertical_input = vertical_input * TAKEOFF_K  # boost thrust during takeoff to get off the ground
 
         # Standard quad-X mixing (front left/rear right vs. front right/rear
@@ -325,18 +328,18 @@ class DroneControllerNode(Node):
         self.motors["rear_left"].setVelocity(-rear_left)
 
 
-class CameraPublisherNode(Node):
-    def __init__(self, supervisor: Supervisor):
-        super().__init__("camera_publisher_node")
-        self.pub_color = self.create_publisher(Image, "/d435i/color/image_raw", 10)
-        self.pub_color_info = self.create_publisher(CameraInfo, "/d435i/color/camera_info", 10)
-        self.pub_infra1 = self.create_publisher(Image, "/d435i/infra1/image_raw", 10)
-        self.pub_infra1_info = self.create_publisher(CameraInfo, "/d435i/infra1/camera_info", 10)
-        self.pub_infra2 = self.create_publisher(Image, "/d435i/infra2/image_raw", 10)
-        self.pub_infra2_info = self.create_publisher(CameraInfo, "/d435i/infra2/camera_info", 10)
-        self.pub_depth = self.create_publisher(Image, "/d435i/depth/image_rect_raw", 10)
-        self.pub_depth_info = self.create_publisher(CameraInfo, "/d435i/depth/camera_info", 10)
-        self.pub_depth_gt = self.create_publisher(Image, "/d435i/depth_gt/image_raw", 10)
+class CameraPublisherNode:
+    def __init__(self, supervisor: Supervisor, node: Node):
+        self.node = node
+        self.pub_color = node.create_publisher(Image, "/d435i/color/image_raw", 10)
+        self.pub_color_info = node.create_publisher(CameraInfo, "/d435i/color/camera_info", 10)
+        self.pub_infra1 = node.create_publisher(Image, "/d435i/infra1/image_raw", 10)
+        self.pub_infra1_info = node.create_publisher(CameraInfo, "/d435i/infra1/camera_info", 10)
+        self.pub_infra2 = node.create_publisher(Image, "/d435i/infra2/image_raw", 10)
+        self.pub_infra2_info = node.create_publisher(CameraInfo, "/d435i/infra2/camera_info", 10)
+        self.pub_depth = node.create_publisher(Image, "/d435i/depth/image_rect_raw", 10)
+        self.pub_depth_info = node.create_publisher(CameraInfo, "/d435i/depth/camera_info", 10)
+        self.pub_depth_gt = node.create_publisher(Image, "/d435i/depth_gt/image_raw", 10)
 
         self.supervisor = supervisor
         self.vision_period_ms = max(supervisor.getBasicTimeStep(), int(round(1000.0 / IMAGE_RATE)))
@@ -491,13 +494,16 @@ def main():
     supervisor = Supervisor()
 
     rclpy.init(args=sys.argv)
-    controller_node = DroneControllerNode(supervisor)
-    realsense_node = CameraPublisherNode(supervisor)
 
-    spin_drone = lambda: rclpy.spin(controller_node)
+    node = Node("mavic2pro_ros2_main")
 
-    drone_controller_thread = threading.Thread(target=spin_drone, daemon=True)
-    drone_controller_thread.start()
+    controller_node = DroneControllerNode(supervisor, node)
+    realsense_node = CameraPublisherNode(supervisor, node)
+
+    spin_drone = lambda: rclpy.spin(node)
+
+    spinner_thread = threading.Thread(target=spin_drone, daemon=True)
+    spinner_thread.start()
 
     last_camera_publish_time = -np.inf
 
@@ -511,8 +517,7 @@ def main():
             realsense_node.publish_images()
             last_camera_publish_time = supervisor.getTime()
     
-    controller_node.destroy_node()
-    realsense_node.destroy_node()
+    node.destroy_node()
     rclpy.shutdown()
 
 
